@@ -36,7 +36,7 @@ async function getAIResponse(input, userId, messageID) {
 
 module.exports = {
   config: {
-    name: 'ai',
+    name: 'xas',
     author: 'Arn',
     role: 0,
     category: 'ai',
@@ -54,8 +54,8 @@ module.exports = {
   },
   onChat: async function ({ event, message }) {
     const messageContent = event.body.trim().toLowerCase();
-    if (messageContent.startsWith("ai")) {
-      const input = messageContent.replace(/^ai\s*/, "").trim();
+    if (messageContent.startsWith("xas")) {
+      const input = messageContent.replace(/^xas\s*/, "").trim();
       const { response, messageID } = await getAIResponse(input, event.senderID, message.messageID);
       message.reply(`
                        
