@@ -34,7 +34,7 @@ module.exports = {
         }
       }
 
-      const textApiUrl = "http://sgp1.hmvhostings.com:25721/gemini";
+      const textApiUrl = "https://kaiz-apis.gleeze.com/api/gpt-4o";
       const imageRecognitionUrl = "https://api.joshweb.click/gemini";
 
       const useImageRecognition =
@@ -50,9 +50,8 @@ module.exports = {
         const imageRecognitionResponse = imageApiResponse.data.gemini || "❌ No response from Gemini Flash Vision.";
         responseMessage = `${imageRecognitionResponse}`;
       } else {
-        // Fetch from Gemini Advanced (text)
-        const textApiResponse = await axios.get(textApiUrl, { params: { question: userPrompt } });
-        const textResponse = textApiResponse.data.answer || "❌ No response from Gemini Advanced.";
+        const textApiResponse = await axios.get(textApiUrl, { params: { q: userPrompt, uid: senderId } });
+        const textResponse = textApiResponse.data.response || "❌ No response from Gemini Advanced.";
         responseMessage = `${textResponse}`;
       }
 
