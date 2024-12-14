@@ -35,8 +35,8 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
   const apiUrl = "https://kaiz-apis.gleeze.com/api/gpt-4o";
 
   try {
-    const { data } = await axios.get(apiUrl, { params: { question: input } });
-    let response = data.response;
+    const aidata = await axios.get(apiUrl, { params: { q: input, uid: senderId } });
+    let response = aidata.data.response;
 
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
 
@@ -97,5 +97,4 @@ function formatResponse(responseText) {
   };
 
   return responseText.split('').map(char => fontMap[char] || char).join('');
-}
-// WhyWouldiCare
+  }
