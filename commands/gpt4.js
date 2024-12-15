@@ -1,98 +1,73 @@
-const axios = require("axios");
+const axios = require('axios');
 const { sendMessage } = require('../handles/sendMessage');
+const fs = require('fs');
+const token = fs.readFileSync('token.txt', 'utf8');
+
+// [ true if turn on font & false if turn off ]
+const useFontFormatting = true;
 
 module.exports = {
-  name: "gpt4",
-  description: "Interact with Gemini AI Advanced ft. Vision",
-  author: "Rized",
+  name: 'gpt4',
+  description: 'Interact to Free GPT - OpenAI.',
+  author: 'Arn', // API by Kenlie Navacilla Jugarap
 
-  async execute(senderId, args, pageAccessToken, event, imageUrl) {
-    const userPrompt = args.join(" ").trim().toLowerCase();
+  async execute(senderId, args) {
+    const pageAccessToken = token;
+    const query = args.join(" ").toLowerCase();
 
-    if (!userPrompt && !imageUrl) {
-      return sendMessage(
-        senderId,
-        { 
-          text: `❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝗽𝗿𝗼𝘃𝗶𝗱𝗲 𝗮 𝗾𝘂𝗲𝘀𝘁𝗶𝗼𝗻 𝗳𝗼𝗿 𝗚𝗲𝗺𝗶𝗻𝗶 𝗔𝗱𝘃𝗮𝗻𝗰𝗲𝗱 𝗼𝗿 𝗮𝗻 𝗶𝗺𝗮𝗴𝗲 𝘄𝗶𝘁𝗵 𝗮 𝗱𝗲𝘀𝗰𝗿𝗶𝗽𝘁𝗶𝗼𝗻 𝗳𝗼𝗿 𝗙𝗹𝗮𝘀𝗵 𝗩𝗶𝘀𝗶𝗼𝗻.` 
-        }, 
-        pageAccessToken
-      );
+    if (!query) {
+      const defaultMessage = "⛷𝙅e 𝒗𝒐𝒖𝒔 𝒑𝒓𝒊𝒆 ძe me ⍴résen𝗍er 𝒍𝒂 𝒒𝒖𝒆𝒔𝒕𝒊𝒐𝒏 𝙨𝙚𝙡𝙤𝙣 𝙫𝙤𝙩𝙧𝙚 préférence⚜, 𝙚𝙩 𝙟𝙚 𝙢'𝙚𝙢𝙥𝙡𝙤𝙞𝙚𝙧𝙖𝙞 à 𝕧𝕠𝕦𝕤 𝕠𝕗𝕗𝕣𝕚𝕣 𝕦𝕟𝕖 réponse 𝕡𝕖𝕣𝕥𝕚𝕟𝕖𝕟𝕥𝕖 𝕖𝕥 adéquate.❤ 𝐒𝐚𝐜𝐡𝐞𝐳 𝐪𝐮𝐞 𝐯𝐨𝐭𝐫𝐞 𝐬𝐚𝐭𝐢𝐬𝐟𝐚𝐜𝐭𝐢𝐨𝐧 𝐝𝐞𝐦𝐞𝐮𝐫𝐞 𝐦𝐚 𝐩𝐫𝐢𝐨𝐫𝐢𝐭é à 𝐭𝐨𝐮𝐭𝐞𝐬 é𝐠𝐚𝐫𝐝𝐬😉.(merci pour votre attention)";
+      const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
+      return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
 
-    sendMessage(
-      senderId,
-      { text: "⌛ 𝗚𝗲𝗺𝗶𝗻𝗶 𝗶𝘀 𝘁𝗵𝗶𝗻𝗸𝗶𝗻𝗴, 𝗽𝗹𝗲𝗮𝘀𝗲 𝘄𝗮𝗶𝘁... " },
-      pageAccessToken
-    );
-
-    try {
-      if (!imageUrl) {
-        if (event.message?.reply_to?.mid) {
-          imageUrl = await getRepliedImage(event.message.reply_to.mid, pageAccessToken);
-        } else if (event.message?.attachments?.[0]?.type === 'image') {
-          imageUrl = event.message.attachments[0].payload.url;
-        }
-      }
-
-      const textApiUrl = "https://kaiz-apis.gleeze.com/api/gpt-4o";
-      const imageRecognitionUrl = "https://api.joshweb.click/gemini";
-
-      const useImageRecognition =
-        imageUrl || 
-        ["recognize", "analyze", "analyst", "answer", "analysis"].some(term => userPrompt.includes(term)); 
-
-      let responseMessage;
-
-      if (useImageRecognition) {
-        const imageApiResponse = await axios.get(imageRecognitionUrl, {
-          params: { prompt: userPrompt, url: imageUrl || "" }
-        });
-        const imageRecognitionResponse = imageApiResponse.data.gemini || "❌ No response from Gemini Flash Vision.";
-        responseMessage = `${imageRecognitionResponse}`;
-      } else {
-        const textApiResponse = await axios.get(textApiUrl, { params: { q: userPrompt, uid: senderId } });
-        const textResponse = textApiResponse.data.response || "❌ No response from Gemini Advanced.";
-        responseMessage = `${textResponse}`;
-      }
-
-      const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
-
-      // Final formatted response
-      const finalResponse = `✨• 𝗚𝗲𝗺𝗶𝗻𝗶 𝗔𝗱𝘃𝗮𝗻𝗰𝗲𝗱 𝗔𝗜\n━━━━━━━━━━━━━━━━━━
-${responseMessage}
-━━━━━━━━━━━━━━━━━━
-📅 𝗗𝗮𝘁𝗲/𝗧𝗶𝗺𝗲: ${responseTime}`;
-
-      await sendConcatenatedMessage(senderId, finalResponse, pageAccessToken);
-
-    } catch (error) {
-      console.error("❌ Error in Gemini command:", error);
-      sendMessage(
-        senderId,
-        { text: `❌ Error: ${error.message || "Something went wrong."}` },
-        pageAccessToken
-      );
+    if (query === "sino creator mo?" || query === "who created you?") {
+      const jokeMessage = "Arn/Rynx Gaiser";
+      const formattedMessage = useFontFormatting ? formatResponse(jokeMessage) : jokeMessage;
+      return await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
     }
+
+    await handleChatResponse(senderId, query, pageAccessToken);
+  },
+};
+
+const handleChatResponse = async (senderId, input, pageAccessToken) => {
+  const apiUrl = "https://kaiz-apis.gleeze.com/api/gpt-4o";
+
+  try {
+    const aidata = await axios.get(apiUrl, { params: { q: input, uid: senderId } });
+    let response = aidata.data.response;
+
+    const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
+
+    const answeringMessage = ``;
+    const formattedAnsweringMessage = useFontFormatting ? formatResponse(answeringMessage) : answeringMessage;
+    await sendMessage(senderId, { text: formattedAnsweringMessage }, pageAccessToken);
+
+    const defaultMessage = `𝗠𝗶𝗿𝗮𝗻𝗱𝗮𝗫💘 / 𝗢𝗽𝗲𝗻𝗔𝗶
+
+♦︎|☛𝗝𝗼𝗸𝗲𝗿​💘 
+✅ Answer: ${response}
+▬▭▬ ▬▭▬✧▬▭▬ ▬▭▬
+⏰ Response: ${responseTime}`;
+
+    const formattedMessage = useFontFormatting ? formatResponse(defaultMessage) : defaultMessage;
+
+    await sendConcatenatedMessage(senderId, formattedMessage, pageAccessToken);
+  } catch (error) {
+    console.error('Error while processing AI response:', error.message);
+
+    const errorMessage = '❌ Ahh sh1t error again.𝗧𝗿𝘆 𝗹𝗮𝘁𝗲𝗿';
+    const formattedMessage = useFontFormatting ? formatResponse(errorMessage) : errorMessage;
+    await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
   }
 };
 
-async function getRepliedImage(mid, pageAccessToken) {
-  const { data } = await axios.get(`https://graph.facebook.com/v21.0/${mid}/attachments`, {
-    params: { access_token: pageAccessToken }
-  });
-
-  if (data?.data?.[0]?.image_data?.url) {
-    return data.data[0].image_data.url;
-  }
-  return "";
-}
-
-async function sendConcatenatedMessage(senderId, text, pageAccessToken) {
+const sendConcatenatedMessage = async (senderId, text, pageAccessToken) => {
   const maxMessageLength = 2000;
 
   if (text.length > maxMessageLength) {
     const messages = splitMessageIntoChunks(text, maxMessageLength);
-
     for (const message of messages) {
       await new Promise(resolve => setTimeout(resolve, 500));
       await sendMessage(senderId, { text: message }, pageAccessToken);
@@ -100,12 +75,26 @@ async function sendConcatenatedMessage(senderId, text, pageAccessToken) {
   } else {
     await sendMessage(senderId, { text }, pageAccessToken);
   }
-}
+};
 
-function splitMessageIntoChunks(message, chunkSize) {
+const splitMessageIntoChunks = (message, chunkSize) => {
   const chunks = [];
   for (let i = 0; i < message.length; i += chunkSize) {
     chunks.push(message.slice(i, i + chunkSize));
   }
   return chunks;
-            }
+};
+
+function formatResponse(responseText) {
+  const fontMap = {
+    ' ': ' ',
+    'a': '𝗮', 'b': '𝗯', 'c': '𝗰', 'd': '𝗱', 'e': '𝗲', 'f': '𝗳', 'g': '𝗴', 'h': '𝗵',
+    'i': '𝗶', 'j': '𝗷', 'k': '𝗸', 'l': '𝗹', 'm': '𝗺', 'n': '𝗻', 'o': '𝗼', 'p': '𝗽', 'q': '𝗾',
+    'r': '𝗿', 's': '𝘀', 't': '𝘁', 'u': '𝘂', 'v': '𝘃', 'w': '𝘄', 'x': '𝘅', 'y': '𝘆', 'z': '𝘇',
+    'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚', 'H': '𝗛',
+    'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡', 'O': '𝗢', 'P': '𝗣', 'Q': '𝗤',
+    'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨', 'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭',
+  };
+
+  return responseText.split('').map(char => fontMap[char] || char).join('');
+}
