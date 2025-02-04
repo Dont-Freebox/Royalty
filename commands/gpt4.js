@@ -32,7 +32,7 @@ module.exports = {
 };
 
 const handleChatResponse = async (senderId, input, pageAccessToken) => {
-  const apiUrl = "https://kaiz-apis.gleeze.com/api/gpt-4o";
+  const apiUrl = "https://kaiz-apis.gleeze.com/api/bert-ai";
 
   try {
     const aidata = await axios.get(apiUrl, { params: { q: input, uid: senderId } });
@@ -40,13 +40,13 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
 
     const responseTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true });
 
-    const answeringMessage = ``;
+    const answeringMessage = `⏳ 𝗝𝘂𝘀𝘁 𝗪𝗮𝗶𝘁...`;
     const formattedAnsweringMessage = useFontFormatting ? formatResponse(answeringMessage) : answeringMessage;
     await sendMessage(senderId, { text: formattedAnsweringMessage }, pageAccessToken);
 
-    const defaultMessage = `𝗠𝗶𝗿𝗮𝗻𝗱𝗮𝗫💘 / 𝗢𝗽𝗲𝗻𝗔𝗶
+    const defaultMessage = `Free GPT / OpenAI
 
-♦︎|☛𝗝𝗼𝗸𝗲𝗿​💘 
+♦︎|☛𝗝𝗼𝗸𝗲𝗿᭄
 ✅ Answer: ${response}
 ▬▭▬ ▬▭▬✧▬▭▬ ▬▭▬
 ⏰ Response: ${responseTime}`;
@@ -57,7 +57,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
   } catch (error) {
     console.error('Error while processing AI response:', error.message);
 
-    const errorMessage = '❌ Ahh sh1t error again.𝗧𝗿𝘆 𝗹𝗮𝘁𝗲𝗿';
+    const errorMessage = '❌ Ahh sh1t error again.';
     const formattedMessage = useFontFormatting ? formatResponse(errorMessage) : errorMessage;
     await sendMessage(senderId, { text: formattedMessage }, pageAccessToken);
   }
@@ -97,4 +97,4 @@ function formatResponse(responseText) {
   };
 
   return responseText.split('').map(char => fontMap[char] || char).join('');
-}
+                                                      }
