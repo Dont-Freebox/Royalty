@@ -32,7 +32,7 @@ module.exports = {
 };
 
 const handleChatResponse = async (senderId, input, pageAccessToken) => {
-  const apiUrl = "https://kaiz-apis.gleeze.com/api/gpt-4o";
+  const apiUrl = "https://kaiz-apis.gleeze.com/api/bert-ai";
 
   try {
     const aidata = await axios.get(apiUrl, { params: { q: input, uid: senderId } });
@@ -46,7 +46,7 @@ const handleChatResponse = async (senderId, input, pageAccessToken) => {
 
     const defaultMessage = `Free GPT / OpenAI
 
-♦︎|☛𝗝𝗼𝗸𝗲𝗿​᭄
+♦︎|☛𝗝𝗼𝗸𝗲𝗿᭄
 ✅ Answer: ${response}
 ▬▭▬ ▬▭▬✧▬▭▬ ▬▭▬
 ⏰ Response: ${responseTime}`;
